@@ -1,0 +1,237 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Colorado BLM Land Under Environmental Concern</title>
+
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: Arial, sans-serif; 
+            background: #f5f5f5; 
+            color: #333;
+        }
+        #map { 
+            position: absolute; 
+            top: 0; 
+            bottom: 0; 
+            width: 100%; 
+        }
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            z-index: 1;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 320px;
+        }
+        .map-overlay h2 {
+            margin: 0 0 15px;
+            font-size: 20px;
+            color: #0056b3;
+        }
+        table {
+            width: 100%;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #444;
+        }
+        .credit {
+            font-size: 12px;
+            color: #555;
+        }
+        a {
+            color: #0077cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .mapboxgl-popup {
+            max-width: 300px;
+            font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0077cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<div class="map-overlay"> 
+    <div class="map-overlay-inner">
+        <h2>Colorado BLM Area of Environmental Concern</h2>
+        
+        <table>
+            <tr>
+                <td>
+                    <input id="year_slider" type="range" min="0" max="8" step="1" value="0" list="tickmarks" />
+                    <datalist id="tickmarks">
+                        <option value="0" label="2017"></option>
+                        <option value="1" label="2018"></option>
+                        <option value="2" label="2019"></option>
+                        <option value="3" label="2020"></option>
+                        <option value="4" label="2021"></option>
+                        <option value="5" label="2022"></option>
+                        <option value="6" label="2023"></option>
+                        <option value="7" label="2024"></option>
+                        <option value="8" label="2025"></option>
+                    </datalist>
+                </td>
+                <td>
+                    <label id="year">2017</label>
+                </td>
+            </tr>            
+        </table>
+
+        <button id="playPauseBtn" class="btn">Play</button>
+
+        <p class="credit"> This map was created using data from the <a href="https://gbp-blm-egis.hub.arcgis.com/datasets/11c9e34831c7446a8202b334bc64898a/about">BLM Natl Designated Areas of Critical Environmental Concern Polygons</a>.
+        </p>
+    </div>
+</div>
+
+<script>
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoibG1qYyIsImEiOiJjbTd3N2Rld24wMnFyMm5vZXo5anQ0OWZhIn0.rd-tZn4NZnNeho_nKVYfsQ';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/lmjc/cm8hqov5f015c01r0ahye4yof',
+        center: [-104.942114, 39.717785],
+        zoom: 8
+    });
+
+    const years = ["2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
+    const colors = [
+        '#ef0c43', '#26c342', '#d6ff19', '#4363D8', 
+        '#575655', '#911EB4', '#f04698', '#F032E6', '#ffffff'
+    ];
+
+    let layers = [];
+    let currentYearIndex = 0;
+    let intervalId = null;
+    let isPlaying = false;
+
+    map.on('load', () => {
+
+        map.addSource('blm-areas', {
+            type: 'vector',
+            url: 'mapbox://lmjc.dpocnms0'
+        });
+
+        // Create a layer for each year
+        years.forEach((year, index) => {
+            const layerId = `blm-layer-${year}`;
+            
+            layers.push(layerId);
+
+            map.addLayer({
+                id: layerId,
+                type: 'fill',
+                source: 'blm-areas',
+                'source-layer': 'BLM_CO_Areas_of_Critical_Envi-5l8p5d',
+                layout: { 'visibility': index === 0 ? 'visible' : 'none' },
+                paint: {
+                    'fill-color': colors[index],  
+                    'fill-opacity': 0.75,
+                    'fill-outline-color': '#000'
+                },
+                filter: ['==', ['slice', ['get', 'last_edited_date'], 0, 4], year]
+            });
+        });
+
+        map.on('click', e => {
+            const features = map.queryRenderedFeatures(e.point, { layers });
+
+            if (features.length > 0) {
+                const feature = features[0];
+                const acecName = feature.properties.ACEC_NAME || 'Unknown';
+                const comments = feature.properties.COMMENTS || '';
+
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(`<strong>ACEC Name:</strong> ${acecName}<br><strong>Comments:</strong> ${comments}`)
+                    .addTo(map);
+            }
+        });
+
+        document.getElementById('year_slider').addEventListener('input', e => {
+            currentYearIndex = parseInt(e.target.value);
+            updateMap();
+        });
+
+        document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+    });
+
+    function updateMap() {
+        layers.forEach((layer, index) => {
+            const visibility = index === currentYearIndex ? 'visible' : 'none';
+            map.setLayoutProperty(layer, 'visibility', visibility);
+        });
+
+        document.getElementById('year').textContent = years[currentYearIndex];
+        document.getElementById('year_slider').value = currentYearIndex; 
+    }
+
+    function togglePlayPause() {
+        if (isPlaying) {
+            clearInterval(intervalId);
+            isPlaying = false;
+            document.getElementById('playPauseBtn').textContent = "Play";
+        } else {
+            intervalId = setInterval(() => {
+                currentYearIndex = (currentYearIndex + 1) % years.length;
+                updateMap();
+            }, 2000);
+            isPlaying = true;
+            document.getElementById('playPauseBtn').textContent = "Pause";
+        }
+    }
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
