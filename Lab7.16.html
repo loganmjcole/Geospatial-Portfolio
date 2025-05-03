@@ -10,7 +10,7 @@
 
 <style>
 
-   
+    /*  Legend Style Sheet  */
     .legend {
         background-color: #fff;
         border-radius: 3px;
@@ -38,7 +38,7 @@
         width: 10px;
     }
 
-    
+    /* Map overlay style sheet  */
 
     .map-overlay {
     font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
@@ -66,7 +66,7 @@
        padding: 0;
     }
 
-   
+    /*  Body & Map Style Sheet  */
     .map-overlay-inner fieldset {
         border: none;
         padding: 0;
@@ -117,10 +117,10 @@
     
     mapboxgl.accessToken = 'pk.eyJ1IjoibG1qYyIsImEiOiJjbTd3N2Rld24wMnFyMm5vZXo5anQ0OWZhIn0.rd-tZn4NZnNeho_nKVYfsQ';  
 
-        
+        // Load a new map in the 'map' HTML div
         var map = new mapboxgl.Map({
-            container: 'map', 
-            style: 'mapbox://styles/lmjc/cm9hud3mh00h301sp8bkk4xvk',
+            container: 'map', // container id
+            style: 'mapbox://styles/lmjc/cm8eye67300x701r0b8pfg2c9',
             center: [-104.951046, 39.732470], 
             zoom: 11 
         });
@@ -139,13 +139,13 @@
                     'visibility': 'visible'
                 },
                 'paint': {
-                    
+                    // color circle by tree genus
                     'fill-color':[
                         'interpolate',
                         ['linear'],
                         ['get', 'n_all'],
                         0, "white",
-                        720, '#504d0d',
+                        720, '#081D58',
 
                     ],
                     'fill-opacity':0.7,
@@ -166,31 +166,36 @@
         ]
 
         var lt_g_max_range = [
-            725, 
-            199, 
-            102, 
-            108, 
-            48,
-            182, 
-            140, 
-            171, 
-            170, 
-            254, 
-            94, 
+            725, // max value range for "n_all"
+            199, // max value range for "n_Ash"
+            102, // max value range for "n_Crabapple"
+            108, // max value range for "n_Elm"
+            48, // max value range for "n_Hackberry"
+            182, // max value range for "n_Honeylocust"
+            140, // max value range for "n_Linden"
+            171, // max value range for "n_Maple"
+            170, // max value range for "n_Oak"
+            254, // max value range for "n_Pine"
+            94, // max value range for "n_Spruce"
         ]
 
         document.getElementById('data_layer').addEventListener('change', function(e){
 
-            var genus_selected = lt_genus[e.target.value]
-            var genus_s_max = lt_g_max_range[e.target.value]
+        document.getElementById('data_layer').addEventListener('change', function(e) {
+    var genus_selected = lt_genus[e.target.value];
+    var genus_s_max = lt_g_max_range[e.target.value];
 
-            map.setPaintProperty("denver_tree_point", 'fill-color', [
-                        'interpolate',
-                        ['log'],
-                        ['get', genus_selected],
-                        0, "white",
-                        genus_s_max, '#504d0d',
-                    ]);
+    var log_max = Math.log(genus_s_max);
+
+    map.setPaintProperty("denver_tree_point", 'fill-color', [
+        'interpolate',
+        ['linear'],
+        ['ln', ['max', ['get', genus_selected], 1]],
+        0, "white",
+        log_max, '#081D58'
+    ]);
+});
+
         })
 
 

@@ -1,191 +1,179 @@
-<html lang="en">
+<html lang=en>
 
 <head>
-  <meta charset="utf-8" />
-  <title>Mapbox Example 17 - 2.5D Tree Hex</title>
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+<meta charset="utf-8" />
+<title>Mapbox Example 17 - 2.5D Tree Hex </title>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+<style>
+
+
+    .legend {
+        background-color: #fff;
+        border-radius: 3px;
+        bottom: 30px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        font:
+            12px/20px 'Helvetica Neue',
+            Arial,
+            Helvetica,
+            sans-serif;
+        padding: 10px;
+        position: absolute;
+        right: 10px;
+        z-index: 1;
+    }
+    .legend h4 {
+        margin: 0 0 10px;
     }
 
-    #map {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 100%;
+    .legend div span {
+        border-radius: 50%;
+        display: inline-block;
+        height: 10px;
+        margin-right: 5px;
+        width: 10px;
     }
+
+    
 
     .map-overlay {
-      font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-      position: absolute;
-      width: 380px;
-      min-width: 380px;
-      top: 0;
-      right: 0;
-      padding: 10px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    position: absolute;
+    width: 380px;
+    min-width: 380px;
+    top: 0;
+    right: 0;
+    padding: 10px;
     }
-
     .map-overlay .map-overlay-inner {
-      background-color: #fff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
-      border-radius: 3px;
-      padding: 10px;
-      margin-bottom: 10px;
+        background-color: #fff;
+        box-shadow:0 1px 2px rgba(0, 0, 0, 0.20);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
     }
-
     .map-overlay h2 {
-      line-height: 24px;
-      margin: 0 0 10px;
+        line-height: 24px;
+        display: block;
+        margin: 0 0 10px;
     }
-
     .map-overlay p.credit {
-      margin: 0 0 10px;
+       margin: 0;
+       padding: 0;
     }
 
+  
     .map-overlay-inner fieldset {
-      border: none;
-      padding: 0;
-      margin: 0 0 10px;
+        border: none;
+        padding: 0;
+        margin: 0 0 10px;
     }
 
-    select {
-      width: 100%;
-      padding: 5px;
-      font-size: 14px;
-    }
-  </style>
+    
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; };
+
+</style>
+
 </head>
 
 <body>
-  <div id="map"></div>
+<div id="map"></div>
 
-  <div class="map-overlay">
-    <div class="map-overlay-inner">
-      <h2>2.5D Denver Tree Map</h2>
+<div class='map-overlay'> 
+    <div class='map-overlay-inner'>
+        <h2> 2.5D Denver Tree Map </h2>
 
-      <p class="credit">This map uses hexagons to visualize tree genera counts. Based on the
-        <a href="https://data.colorado.gov/Environment/Map-of-Tree-Inventory-Denver/hzmx-2dfk" target="_blank">Denver Tree Inventory</a>.
-      </p>
+        <p class="credit"> This map uses hexagons to visualize the tree data. It is created using the <a href="https://data.colorado.gov/Environment/Map-of-Tree-Inventory-Denver/hzmx-2dfk"> Denver Tree Inventory data </a>. </p>
 
-      <p class="credit">Zoom in to <a href="#" class="credit" id="den_view">Denver</a></p>
+        <p class="credit"> Zoom in to <a href="#" class="credit" id="den_view">Denver</a> </p>
 
-      <fieldset>
-        <label for="data_layer"><strong>Select Genus:</strong></label>
-        <select id="data_layer">
-          <option value="Maple">Maple</option>
-          <option value="Honeylocust">Honeylocust</option>
-          <option value="Crabapple">Crabapple</option>
-          <option value="Oak">Oak</option>
-          <option value="Elm">Elm</option>
-          <option value="Pine">Pine</option>
-          <option value="Ash">Ash</option>
-          <option value="Hackberry">Hackberry</option>
-          <option value="Spruce">Spruce</option>
-        </select>
-      </fieldset>
     </div>
-  </div>
+</div>
 
-  <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoibG1qYyIsImEiOiJjbTd3N2Rld24wMnFyMm5vZXo5anQ0OWZhIn0.rd-tZn4NZnNeho_nKVYfsQ';
 
-    // Genus attribute keys in the data
-    const lt_genus = {
-      Maple: "n_maple",
-      Honeylocust: "n_honeylocust",
-      Crabapple: "n_crabapple",
-      Oak: "n_oak",
-      Elm: "n_elm",
-      Pine: "n_pine",
-      Ash: "n_ash",
-      Hackberry: "n_hackberry",
-      Spruce: "n_spruce"
-    };
+<script>
 
-    // Estimated max values per genus for scaling color & height
-    const lt_g_max_range = {
-      Maple: 300,
-      Honeylocust: 250,
-      Crabapple: 200,
-      Oak: 150,
-      Elm: 100,
-      Pine: 90,
-      Ash: 80,
-      Hackberry: 60,
-      Spruce: 40
-    };
+    
+    mapboxgl.accessToken = 'pk.eyJ1IjoibG1qYyIsImEiOiJjbTd3N2Rld24wMnFyMm5vZXo5anQ0OWZhIn0.rd-tZn4NZnNeho_nKVYfsQ';  
 
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/lmjc/cm9hv8t6g001401soe56f7fvq',
-      center: [-104.951046, 39.732470],
-      zoom: 11,
-      pitch: 50
-    });
+        
+        var map = new mapboxgl.Map({
+            container: 'map', 
+            style: 'mapbox://styles/lmjc/cm9hv8t6g001401soe56f7fvq', 
+            center: [-104.951046, 39.732470],
+            zoom: 11, 
+            pitch: 50 
+        });
 
-    map.on('load', function () {
-      map.setLight({ color: "#fff", intensity: 0.15, position: [1, 180, 30] });
-      map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        
+        map.on('load', function() {     
+            
+            
+            map.setLight({color: "#fff", intensity: 0.15, position: [1, 180, 30]});
+            
+            map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');   
 
-      map.addLayer({
-        id: 'denver_tree_point',
-        type: 'fill-extrusion',
-        source: {
-          type: 'vector',
-          url: 'mapbox://lmjc.d1y9ugrp'
-        },
-        'source-layer': 'denver_hexagon_tree_count_top-4m2in9',
-        layout: {
-          visibility: 'visible'
-        },
-        paint: {
-          'fill-extrusion-color': [
-            'interpolate',
-            ['linear'],
-            ['get', 'n_maple'],
-            0, "white",
-            lt_g_max_range["Maple"], '#93a513'
-          ],
-          'fill-extrusion-height': [
-            '*', 3, ['get', 'n_maple']
-          ],
-          'fill-extrusion-opacity': 0.8
-        }
-      });
+            
+            map.addLayer({
+                'id':'denver_tree_point',
+                'type':'fill-extrusion',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://lmjc.d1y9ugrp' 
+                },
+                'source-layer':'denver_hexagon_tree_count_top-4m2in9', 
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    
+                    'fill-extrusion-color':[
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'n_all'],
+                        0, "white",
+                        720, '#93a513',
 
-      document.getElementById('data_layer').addEventListener('change', function (e) {
-        const genus = e.target.value;
-        const field = lt_genus[genus];
-        const maxVal = lt_g_max_range[genus];
+                    ],
+                    'fill-extrusion-height':['*', 3, ['get', 'n_all']],  
+                    'fill-extrusion-opacity':0.8
+                }
+            });
 
-        map.setPaintProperty('denver_tree_point', 'fill-extrusion-color', [
-          'interpolate',
-          ['linear'],
-          ['get', field],
-          0, "white",
-          maxVal, '#93a513'
-        ]);
+        })
 
-        map.setPaintProperty('denver_tree_point', 'fill-extrusion-height', [
-          '*', 3, ['get', field]
-        ]);
-      });
-    });
+        
+        document.getElementById('den_view').addEventListener('click', function(e){
 
-    document.getElementById('den_view').addEventListener('click', function (e) {
-      map.flyTo({
-        center: [-104.961046, 39.732470],
-        zoom: 12,
-        speed: 0.3,
-        pitch: 60
-      });
-    });
-  </script>
+            map.flyTo({
+                center:[-104.961046, 39.732470],
+                zoom:12,
+                speed:0.3,
+                pitch:60
+            })
+        })
+    
+    document.getElementById('data_layer').addEventListener('change', function(e){
+
+            var genus_selected = lt_genus[e.target.value]
+            var genus_s_max = lt_g_max_range[e.target.value]
+
+            map.setPaintProperty("denver_tree_point", 'fill-color', [
+                        'interpolate',
+                        ['linear'],
+                        ['get', genus_selected],
+                        0, "white",
+                        genus_s_max, '#081D58',
+                    ]);
+        })
+
+
+</script>
+
 </body>
-
 </html>
