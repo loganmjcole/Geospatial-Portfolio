@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Living Environment Final Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-y: scroll;
+      scroll-snap-type: y block mandatory ;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: #1f2937;
+      color: white;
+      text-align: center;
+      padding: 1em 0;
+      z-index: 10;
+      box-shadow: 0 4px 6px rgba(192, 122, 42, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    section {
+      height: 100vh;
+      scroll-snap-align: start;
+      overflow: hidden;
+      padding-top: 80px; 
+      box-sizing: border-box;
+    }
+
+    h2 {
+      margin: 0;
+      padding: 1em;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: white;
+      border-radius: 10px 10px 0 0;
+    }
+
+    section:nth-of-type(1) h2 {
+      background: #eab308; 
+    }
+
+    section:nth-of-type(2) h2 {
+      background: #8b5cf6; 
+    }
+
+    section:nth-of-type(3) h2 {
+      background: #0c719e; 
+    }
+      
+    section:nth-of-type(4) h2 {
+  background: #1e9438; 
+}  
+
+section:nth-of-type(5) h2 {
+  background: #063b54; 
+}
+    iframe {
+      width: 100%;
+      height: calc(100% - 4em);
+      border: none;
+      border-radius: 0 0 10px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Mining History Explorer</h1>
+  </header>
+    
+  <section>
+    <h2>Active Surface Gold Mines</h2>
+    <iframe src="https://hikingpete.github.io/CartographyMines/00_ColoradoMines_final.html" title="Mining Settlements Timeline"
+  ></iframe></section>
+
+    <section>
+        <h2>Density of Mining Claims in 1892 </h2>
+    <iframe src="https://mmcaninc.github.io/CrippleCreekMiningData/Final.html" title="Final Geospatial Project"></iframe>
+  </section>
+    
+  <section>
+    <h2>Active Surface Gold Mines</h2>
+    <iframe src="https://hankpu.github.io/Active-Surface-Gold-Mines/Active_Surface_Gold.html" title="Active Surface Gold Mines"></iframe>
+  </section>
+
+  <section>
+    <h2>Active Underground Clay Mines</h2>
+    <iframe src="https://hankpu.github.io/Active-Underground-Clay-Mines/Active_Clay.html" title="Active Underground Clay Mines"></iframe>
+  </section>
+    
+  <section>
+      <h2>Current Property Value of Historic Mining Claim Sites</h2>
+    <iframe src="https://loganmjcole.github.io/Geospatial-Portfolio/finalproject.4.html" title="Final Geospatial Project"></iframe>
+  </section>
+    
+  
+    
+</body>
+</html>
+
+
+
